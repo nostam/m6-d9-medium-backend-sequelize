@@ -1,0 +1,36 @@
+
+CREATE TABLE IF NOT EXISTS authors(
+	id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	name VARCHAR(50) NOT NULL,
+	surname VARCHAR(50) NOT NULL,
+	img VARCHAR(65535)
+);
+CREATE TABLE IF NOT EXISTS articles(
+	id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	headline VARCHAR (100) NOT NULL,
+	subhead VARCHAR (200),
+	content TEXT NOT NULL,
+	category_name VARCHAR(40),
+	category_img VARCHAR(65535),
+	author_id INTEGER NOT NULL,
+	cover VARCHAR(65535),
+	created_at TIMESTAMPTZ DEFAULT NOW(),
+	updated_at TIMESTAMPTZ DEFAULT NOW()
+	--PRIMARY KEY(id) REFERENCE articles(updated_at) ON UPDATE NOW()
+	--FOREIGN KEY(author_id) REFERENCES authors(id)
+);
+CREATE TABLE IF NOT EXISTS reviews(
+	id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	text TEXT NOT NULL,
+	author_id INTEGER NOT NULL,
+	created_at TIMESTAMPTZ DEFAULT NOW(),
+	updated_at TIMESTAMPTZ DEFAULT NOW()
+ 	--FOREIGN KEY(author_id) REFERENCES authors(id)
+);
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+CREATE TRIGGER update_article_modtime BEFORE UPDATE ON articles FOR EACH ROW EXECUTE PROCEDURE  update_updated_at_column();
+CREATE TRIGGER update_article_modtime BEFORE UPDATE ON reviews FOR EACH ROW EXECUTE PROCEDURE  update_updated_at_column();
