@@ -22,8 +22,20 @@ router.get("/:id", async (req, res, next) => {
 
 router.get("/:articleId/reviews", async (req, res, next) => {
   try {
-    const reviews = await Reviews.find();
-    res.send(reviews);
+    //TODO pagination
+    const { rows } = await Reviews.run(
+      `SELECT * FROM reviews WHERE article_id = '${req.params.articleId}'`
+    );
+    res.send(rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/:articleId/reviews/:reviewId", async (req, res, next) => {
+  try {
+    const { rows } = await Reviews.findById(req.params.reviewId);
+    res.send(rows);
   } catch (error) {
     next(error);
   }
