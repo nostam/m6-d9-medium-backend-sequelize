@@ -1,11 +1,11 @@
 const router = require("express").Router();
 const Model = require("../../utils/model");
 const Articles = new Model("articles");
-
+const Reviews = new Model("reviews");
 router.get("/", async (req, res, next) => {
   try {
-    const response = await Articles.findOne();
-    res.send(response);
+    const { rows } = await Articles.find();
+    res.send(rows);
   } catch (e) {
     next(e);
   }
@@ -17,6 +17,15 @@ router.get("/:id", async (req, res, next) => {
     res.send(rows);
   } catch (e) {
     next(e);
+  }
+});
+
+router.get("/:articleId/reviews", async (req, res, next) => {
+  try {
+    const reviews = await Reviews.find();
+    res.send(reviews);
+  } catch (error) {
+    next(error);
   }
 });
 

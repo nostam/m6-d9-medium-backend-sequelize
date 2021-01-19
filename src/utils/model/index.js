@@ -43,7 +43,7 @@ class Model {
     return response;
   }
 
-  async findOne(fields) {
+  async find(fields) {
     if (!fields || Object.values(fields).length === 0) {
       const query = `SELECT * FROM ${this.name}`;
       const response = await this.run(query);

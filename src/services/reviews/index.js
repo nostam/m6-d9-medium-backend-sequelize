@@ -4,8 +4,8 @@ const Reviews = new Model("reviews");
 
 router.get("/", async (req, res, next) => {
   try {
-    const response = await Reviews.findOne();
-    res.send(response);
+    const { rows } = await Reviews.find();
+    res.send(rows);
   } catch (e) {
     next(e);
   }

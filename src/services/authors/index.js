@@ -4,8 +4,8 @@ const Authors = new Model("authors");
 
 router.get("/", async (req, res, next) => {
   try {
-    const response = await Authors.findOne();
-    res.send(response);
+    const { rows } = await Authors.find();
+    res.send(rows);
   } catch (e) {
     next(e);
   }
