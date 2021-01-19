@@ -29,12 +29,9 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.put("/:article_id", async (req, res, next) => {
+router.put("/:id", async (req, res, next) => {
   try {
-    const response = await Reviews.findByIdAndUpdate(
-      req.params.article_id,
-      req.body
-    );
+    const response = await Reviews.findByIdAndUpdate(req.params.id, req.body);
     res.send(response);
   } catch (e) {
     next(e);

@@ -50,6 +50,15 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+router.post("/:id", async (req, res, next) => {
+  try {
+    const res = await Reviews.save(req.body);
+    res.status(201).send();
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.put("/:id", async (req, res, next) => {
   try {
     const response = await Articles.findByIdAndUpdate(req.params.id, req.body);
@@ -59,12 +68,33 @@ router.put("/:id", async (req, res, next) => {
   }
 });
 
+router.put("/:articleId/reviews/:reviewId", async (req, res, next) => {
+  try {
+    const res = await Reviews.findByIdAndUpdate(req.params.reviewId, {
+      ...req.body,
+      article_id: req.params.articleId, //TODO author id can still be hijacked
+    });
+    res.send(res);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.delete("/:id", async (req, res, next) => {
   try {
     const { rows } = await Articles.findByIdAndDelete(req.params.id);
     res.send(rows);
   } catch (e) {
     next(e);
+  }
+});
+
+router.delete("/:articleId/reviews/:reviewsId", async (req, res, next) => {
+  try {
+    const { rows } = await Reviews.findByIdAndDelete(req.params.reviewId);
+    res.send(rows);
+  } catch (error) {
+    next(error);
   }
 });
 
