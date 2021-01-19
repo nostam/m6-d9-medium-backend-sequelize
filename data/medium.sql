@@ -20,7 +20,7 @@ CREATE TABLE articles(
 	cover VARCHAR(65535) NOT NULL,
 	created_at TIMESTAMPTZ DEFAULT NOW(),
 	updated_at TIMESTAMPTZ DEFAULT NOW(),
-	--CONSTRAINT author_id FOREIGN KEY(author_id) REFERENCES authors(id)
+	FOREIGN KEY(author_id) REFERENCES authors(id)
 );
 CREATE TABLE reviews(
 	id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -28,8 +28,7 @@ CREATE TABLE reviews(
 	author_id INTEGER NOT NULL,
 	article_id INTEGER NOT NULL,
 	created_at TIMESTAMPTZ DEFAULT NOW(),
-	updated_at TIMESTAMPTZ DEFAULT NOW(),
- 	--FOREIGN KEY(author_id) REFERENCES authors(id)
+	FOREIGN KEY(author_id) REFERENCES authors(id)
 );
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS /*$$*/'
