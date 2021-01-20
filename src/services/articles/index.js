@@ -24,6 +24,7 @@ const articleQuery = `SELECT a.id AS _id, a.headline AS "headLine", a.subhead AS
 const articlesQuery = `SELECT
 a.id AS _id, a.headline AS "headLine", a.subhead AS "subHead", a.content AS content,
 a.cover AS cover, a.created_at AS "createdAt", a.updated_at AS "updatedAt",
+CONCAT('{',json_object_agg('_id', authors.id),', ',json_object_agg('name', CONCAT(' ',authors.name, authors.surname)),', ',json_object_agg('img', categories.img), '}') AS author,
 CONCAT('{',json_object_agg('_id', categories.id),', ',json_object_agg('name', categories.name),', ',json_object_agg('img', categories.img), '}') AS category,
 json_agg(row_to_json((SELECT ColName FROM (SELECT r.id, r.text, r.created_at) AS ColName (_id, TEXT, "createdAt")))) AS reviews
 FROM articles AS a
