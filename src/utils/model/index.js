@@ -1,5 +1,5 @@
 const db = require("../db");
-// 'findById*' rely on id is named "id" among all tables
+// 'findById*' rely on id is named "id" among all tables, might need this.name.slice(0, -1) but categories and category
 class Model {
   constructor(name) {
     this.name = name;
