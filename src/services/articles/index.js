@@ -52,7 +52,9 @@ router.get("/:id", async (req, res, next) => {
     // const { rows } = await db.query(
     //   `${articleQuery} WHERE a.id=${req.params.id}`
     // );
-    const rows = await db.query(`${articleQuery} WHERE a.id=${req.params.id}`);
+    const { rows } = await db.query(
+      `${articleQuery} WHERE a.id=${req.params.id}`
+    );
     rows["category"] = {
       name: rows.categoryName,
       img: rows.categoryImg,
@@ -69,6 +71,7 @@ router.get("/:id", async (req, res, next) => {
       reviews: reviews.rows,
       // category: category.rows[0],
     };
+    console.log(response);
     // response._id = response.id;
     // delete response.id;
     res.send(response);
