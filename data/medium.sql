@@ -20,7 +20,7 @@ CREATE TABLE articles(
 	cover TEXT NOT NULL,
 	created_at TIMESTAMPTZ DEFAULT NOW(),
 	updated_at TIMESTAMPTZ DEFAULT NOW(),
-	FOREIGN KEY (author_id) REFERENCES authors(id)
+	FOREIGN KEY (author_id) REFERENCES authors(id),
 	FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 CREATE TABLE reviews(
@@ -29,7 +29,7 @@ CREATE TABLE reviews(
 	author_id INTEGER NOT NULL,
 	article_id INTEGER NOT NULL,
 	created_at TIMESTAMPTZ DEFAULT NOW(),
-	FOREIGN KEY (author_id) REFERENCES authors(id)
+	FOREIGN KEY (author_id) REFERENCES authors(id),
 	FOREIGN KEY (article_id) REFERENCES articles(id)
 );
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -44,5 +44,12 @@ CREATE TRIGGER update_article_modtime BEFORE UPDATE ON reviews FOR EACH ROW EXEC
 --dummy data
 INSERT INTO authors(name, surname) VALUES ('demo', 'demo');
 INSERT INTO categories(name, img) VALUES ('news', 'https://picsum.photos/100');
+INSERT INTO articles(headline, content, category_id, author_id, cover) VALUES ('Hello World', 'Your first article', '1','1', 'https://picsum.photos/400');
+INSERT INTO articles(headline, content, category_id, author_id, cover) VALUES ('Hello World', 'Your first article', '1','1', 'https://picsum.photos/400');
+INSERT INTO articles(headline, content, category_id, author_id, cover) VALUES ('Hello World', 'Your first article', '1','1', 'https://picsum.photos/400');
+INSERT INTO articles(headline, content, category_id, author_id, cover) VALUES ('Hello World', 'Your first article', '1','1', 'https://picsum.photos/400');
+INSERT INTO articles(headline, content, category_id, author_id, cover) VALUES ('Hello World', 'Your first article', '1','1', 'https://picsum.photos/400');
+INSERT INTO articles(headline, content, category_id, author_id, cover) VALUES ('Hello World', 'Your first article', '1','1', 'https://picsum.photos/400');
+INSERT INTO articles(headline, content, category_id, author_id, cover) VALUES ('Hello World', 'Your first article', '1','1', 'https://picsum.photos/400');
 INSERT INTO articles(headline, content, category_id, author_id, cover) VALUES ('Hello World', 'Your first article', '1','1', 'https://picsum.photos/400');
 INSERT INTO reviews(text, author_id, article_id) VALUES ('look nice!', '1','1');

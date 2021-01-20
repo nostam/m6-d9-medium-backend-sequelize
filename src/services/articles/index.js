@@ -9,20 +9,38 @@ const { validateArticle, validateReview } = require("../../utils/validate");
 const convertArticleBody = (obj) => {
   const newArticle = { ...obj };
   newArticle.id = req.body._id;
-  (newArticle.author_id = req.body.author._id),
-    (newArticle.category_id = req.body.category._id);
+  newArticle.author_id = req.body.author._id;
+  newArticle.category_id = req.body.category._id;
   delete req.body._id, req.author, req.body.category;
   return newArticle;
 };
 
+const articleQuery = `
+  SELECT a.id AS _id, a.headline AS "headLine", a.subhead AS "subHead", a.content AS content, a.cover AS cover, a.created_at AS "createdAt", a.updated_at AS "updatedAt", c.name AS "categoryName", c.img AS "categoryImg", c.id AS "categoryId", authors.name || ' ' || authors.surname AS author
+  FROM articles AS a
+  JOIN categories AS c ON c.id = a.category_id
+  JOIN authors ON authors.id = a.author_id
+  `;
+
 router.get("/", async (req, res, next) => {
   try {
-    const { rows } = await Articles.find();
+    // const { rows } = await Articles.find();
+    // rows.map((r) => {
+    //   r._id = r.id;
+    //   delete r.id;
+    // });
+    const { rows } = await db.query(articleQuery);
+    console.log(rows);
     rows.map((r) => {
-      r._id = r.id;
-      delete r.id;
+      r["category"] = {
+        name: r.categoryName,
+        img: r.categoryImg,
+        _id: r.categoryId,
+      };
+      delete r.categoryName, r.categoryId, r.categoryImg;
     });
-    res.send(rows);
+    const response = { articles: rows };
+    res.send(response);
   } catch (e) {
     next(e);
   }
@@ -30,21 +48,29 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const { rows } = await Articles.findById(req.params.id);
-    const reviews = await db.query(`SELECT authors.name AS name, text FROM reviews
+    // const { rows } = await Articles.findById(req.params.id);
+    // const { rows } = await db.query(
+    //   `${articleQuery} WHERE a.id=${req.params.id}`
+    // );
+    const rows = await db.query(`${articleQuery} WHERE a.id=${req.params.id}`);
+    rows["category"] = {
+      name: rows.categoryName,
+      img: rows.categoryImg,
+      _id: rows.categoryId,
+    };
+    const reviews = await db.query(`
+    SELECT authors.name AS name, text FROM reviews
     INNER JOIN articles ON reviews.article_id = articles.id
     INNER JOIN authors ON reviews.author_id = authors.id
-      WHERE articles.id=${req.params.id}`);
-    const category = await db.query(`SELECT name, img from categories AS c INNER JOIN articles AS a ON a.category_id = c.id
-    WHERE a.id =${req.params.id}`);
+    WHERE articles.id=${req.params.id}
+    `);
     let response = {
       ...rows[0],
       reviews: reviews.rows,
-      category: category.rows[0],
+      // category: category.rows[0],
     };
-    response._id = response.id;
-    delete response.id;
-    sortObj(response);
+    // response._id = response.id;
+    // delete response.id;
     res.send(response);
   } catch (e) {
     next(e);
