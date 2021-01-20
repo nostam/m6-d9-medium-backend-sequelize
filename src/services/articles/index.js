@@ -15,12 +15,22 @@ const convertArticleBody = (obj) => {
   return newArticle;
 };
 
-const articleQuery = `
-  SELECT a.id AS _id, a.headline AS "headLine", a.subhead AS "subHead", a.content AS content, a.cover AS cover, a.created_at AS "createdAt", a.updated_at AS "updatedAt", c.name AS "categoryName", c.img AS "categoryImg", c.id AS "categoryId", authors.name || ' ' || authors.surname AS author
+const articleQuery = `SELECT a.id AS _id, a.headline AS "headLine", a.subhead AS "subHead", a.content AS content, a.cover AS cover, a.created_at AS "createdAt", a.updated_at AS "updatedAt", c.name AS "categoryName", c.img AS "categoryImg", c.id AS "categoryId", authors.name || ' ' || authors.surname AS author
   FROM articles AS a
   JOIN categories AS c ON c.id = a.category_id
   JOIN authors ON authors.id = a.author_id
   `;
+
+const articlesQuery = `SELECT
+a.id AS _id, a.headline AS "headLine", a.subhead AS "subHead", a.content AS content,
+a.cover AS cover, a.created_at AS "createdAt", a.updated_at AS "updatedAt",
+CONCAT('{',json_object_agg('_id', categories.id),', ',json_object_agg('name', categories.name),', ',json_object_agg('img', categories.img), '}') AS category,
+json_agg(row_to_json((SELECT ColName FROM (SELECT r.id, r.text, r.created_at) AS ColName (_id, TEXT, "createdAt")))) AS reviews
+FROM articles AS a
+INNER JOIN categories ON a.category_id = categories.id
+INNER JOIN authors ON authors.id = a.author_id
+INNER JOIN reviews AS r ON r.author_id = a.id
+GROUP BY a.id`;
 
 router.get("/", async (req, res, next) => {
   try {
@@ -29,16 +39,12 @@ router.get("/", async (req, res, next) => {
     //   r._id = r.id;
     //   delete r.id;
     // });
-    const { rows } = await db.query(articleQuery);
-    console.log(rows);
-    rows.map((r) => {
-      r["category"] = {
-        name: r.categoryName,
-        img: r.categoryImg,
-        _id: r.categoryId,
-      };
-      delete r.categoryName, r.categoryId, r.categoryImg;
-    });
+    // const rrr = await db.query(
+    //   "SELECT row_to_json(row) from (select categories.* ROW(categories.name::came) as came from categories )row;"
+    // );
+
+    // res.send(rrr);
+    const { rows } = await db.query(articlesQuery);
     const response = { articles: rows };
     res.send(response);
   } catch (e) {
@@ -56,9 +62,9 @@ router.get("/:id", async (req, res, next) => {
       `${articleQuery} WHERE a.id=${req.params.id}`
     );
     rows["category"] = {
+      _id: rows.categoryId,
       name: rows.categoryName,
       img: rows.categoryImg,
-      _id: rows.categoryId,
     };
     const reviews = await db.query(`
     SELECT authors.name AS name, text FROM reviews
