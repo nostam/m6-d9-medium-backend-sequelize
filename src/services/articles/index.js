@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator");
 const { Op } = require("sequelize");
 const { validateArticle, validateReview } = require("../../utils/validate");
 const { Category, Author, Article, Review } = require("../../utils/db");
-
+const { err } = require("../../utils/");
 const convertArticleBody = (obj) => {
   const newArticle = { ...obj };
   newArticle.id = req.body._id;
@@ -27,7 +27,7 @@ ArticlesRouter.route("/")
   .post(validateArticle, async (req, res, next) => {
     try {
       const errors = validationResult(req);
-      if (!errors.isEmpty()) return next(err(errors.array(), 404));
+      if (!errors.isEmpty()) return next(err(errors.array(), 400));
       const newArticle = await Article.create(req.body);
       res.status(201).send(newArticle);
     } catch (e) {
@@ -81,10 +81,11 @@ ArticlesRouter.route("/:id")
 ArticlesRouter.get("/:articleId/reviews", async (req, res, next) => {
   try {
     //TODO pagination
-    const { rows } = await Reviews.run(
-      `SELECT * FROM reviews WHERE article_id = '${req.params.articleId}'`
-    );
-    res.send(rows);
+    const data = await Review.findAll({
+      include: Author,
+    });
+
+    res.send(data);
   } catch (error) {
     next(error);
   }
@@ -93,8 +94,8 @@ ArticlesRouter.get("/:articleId/reviews", async (req, res, next) => {
 ArticlesRouter.route("/:articleId/reviews/:reviewId")
   .get(async (req, res, next) => {
     try {
-      const { rows } = await Reviews.findById(req.params.reviewId);
-      res.send(rows[0]);
+      const review = await Review.findByPk(req.params.reviewId);
+      res.send(review);
     } catch (error) {
       next(error);
     }

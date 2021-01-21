@@ -1,13 +1,21 @@
 const { body } = require("express-validator");
-
+//no-sequelize
+// const validateArticle = [
+//   body("headline").notEmpty().isString(),
+//   body("subhead").isString(),
+//   body("content").notEmpty().isString(),
+//   body("category.name").isString(),
+//   body("category.img").isURL(),
+//   body("author.name").isString(),
+//   body("author.img").isURL(),
+//   body("cover").isURL(),
+// ];
+//sequelize
 const validateArticle = [
-  body("headline").notEmpty().isString(),
-  body("subhead").isString(),
+  body("headLine").notEmpty().isString(),
   body("content").notEmpty().isString(),
-  body("category.name").isString(),
-  body("category.img").isURL(),
-  body("author.name").isString(),
-  body("author.img").isURL(),
+  body("categoryId").isInt(),
+  body("authorId").isInt(),
   body("cover").isURL(),
 ];
 
