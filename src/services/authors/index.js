@@ -1,20 +1,19 @@
 const AuthorsRouter = require("express").Router();
-const Model = require("../../utils/model");
-const Authors = new Model("authors");
+const { Author } = require("../../utils/db");
 
 AuthorsRouter.route("/")
   .get(async (req, res, next) => {
     try {
-      const { rows } = await Authors.find();
-      res.send(rows);
+      const data = await Author.findAll();
+      res.send(data);
     } catch (e) {
       next(e);
     }
   })
   .post(async (req, res, next) => {
     try {
-      const response = await Authors.save(req.body);
-      res.status(201).send(response);
+      const newAuthor = await Author.create(req.body);
+      res.status(201).send(newAuthor);
     } catch (e) {
       next(e);
     }
@@ -23,24 +22,29 @@ AuthorsRouter.route("/")
 AuthorsRouter.route("/:id")
   .get(async (req, res, next) => {
     try {
-      const { rows } = await Authors.findById(req.params.id);
-      res.send(rows);
+      const author = await Authors.findByPk(req.params.id);
+      res.send(author);
     } catch (e) {
       next(e);
     }
   })
   .put(async (req, res, next) => {
     try {
-      const response = await Authors.findByIdAndUpdate(req.params.id, req.body);
-      res.send(response);
+      const authorArr = await Authors.update(req.body, {
+        returning: true,
+        plain: true,
+        where: { id: req.params.id },
+      });
+      res.send(authorArr[1]);
     } catch (e) {
       next(e);
     }
   })
   .delete(async (req, res, next) => {
     try {
-      const { rows } = await Authors.findByIdAndDelete(req.params.id);
-      res.send(rows);
+      const request = await Authors.destory({ where: { id: req.params.id } });
+      if (request === 0) next(err("ID not found", 404));
+      res.send("Deleted");
     } catch (e) {
       next(e);
     }
