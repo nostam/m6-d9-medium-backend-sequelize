@@ -9,6 +9,8 @@ const {
   forbiddenHandler,
   catchAllHandler,
 } = require("./utils/errorHandlers");
+
+const db = require("./utils/db");
 const servicesRoutes = require("./services");
 
 server.use(cors());
@@ -21,8 +23,10 @@ server.use(unauthorizedHandler);
 server.use(forbiddenHandler);
 server.use(catchAllHandler);
 
-server.listen(port, () => {
-  console.info("Server is running on port " + port);
+db.sequelize.sync({ force: false }).then((result) => {
+  server.listen(port, () => {
+    console.log("server is running on port ", process.env.PORT || 3002);
+  });
 });
 
 server.on("error", (error) => {
