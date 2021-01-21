@@ -6,7 +6,7 @@ const { validateReview } = require("../../utils/validate");
 ReviewsRouter.route("/")
   .get(async (req, res, next) => {
     try {
-      const data = await Article.findAll({
+      const data = await Review.findAll({
         include: Author,
       });
       res.send(data);
