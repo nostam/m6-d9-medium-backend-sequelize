@@ -13,7 +13,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       subHead: {
         type: DataTypes.STRING(200),
-        allowNull: false,
       },
       content: { type: DataTypes.TEXT, allowNull: false },
       categoryId: { type: DataTypes.INTEGER, allowNull: false },
@@ -24,8 +23,9 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Article.associate = (models) => {
-    Article.belongsTo(models.Category, { through: models.category });
-    Article.belongsTo(models.Author, { through: models.author });
+    Article.belongsTo(models.Category, { through: models.Category });
+    Article.belongsTo(models.Author, { through: models.Author });
+    Article.hasMany(models.Review);
     Article.belongsToMany(models.Author, { through: models.Clap });
   };
 

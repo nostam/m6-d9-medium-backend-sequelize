@@ -1,4 +1,4 @@
-const AuthorsRouter = require("express").router();
+const AuthorsRouter = require("express").Router();
 const Model = require("../../utils/model");
 const Authors = new Model("authors");
 

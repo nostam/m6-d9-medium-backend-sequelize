@@ -16,6 +16,7 @@ const Author = require("./author");
 const Category = require("./category");
 const Article = require("./article");
 const Clap = require("./clap");
+const Review = require("./review");
 
 const sequelize = new Sequelize(
   process.env.PGDATABASE,
@@ -32,6 +33,7 @@ const models = {
   Category: Category(sequelize, DataTypes),
   Article: Article(sequelize, DataTypes),
   Clap: Clap(sequelize, DataTypes),
+  Review: Review(sequelize, DataTypes),
 };
 
 Object.keys(models).forEach((modelName) => {

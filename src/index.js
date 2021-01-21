@@ -23,7 +23,7 @@ server.use(unauthorizedHandler);
 server.use(forbiddenHandler);
 server.use(catchAllHandler);
 
-db.sequelize.sync({ force: false }).then((result) => {
+db.sequelize.sync({ force: true }).then((result) => {
   server.listen(port, () => {
     console.log("server is running on port ", process.env.PORT || 3002);
   });

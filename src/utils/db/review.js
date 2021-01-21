@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
   );
   Review.associate = (models) => {
     Review.belongsTo(models.Article, {
-      through: { model: models.Author, unique: false },
+      through: models.Author,
     });
   };
   return Review;

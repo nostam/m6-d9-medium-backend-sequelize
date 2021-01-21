@@ -1,10 +1,9 @@
 const ArticlesRouter = require("express").Router();
 const { validationResult } = require("express-validator");
-const Model = require("../../utils/model");
-const Articles = new Model("articles");
-const Reviews = new Model("reviews");
 const db = require("../../utils/db");
+const { Op } = require("sequelize");
 const { validateArticle, validateReview } = require("../../utils/validate");
+const { Category } = require("../../utils/db");
 
 const convertArticleBody = (obj) => {
   const newArticle = { ...obj };
@@ -15,40 +14,15 @@ const convertArticleBody = (obj) => {
   return newArticle;
 };
 
-const articleQuery = `SELECT a.id AS _id, a.headline AS "headLine", a.subhead AS "subHead", a.content AS content, a.cover AS cover, a.created_at AS "createdAt", a.updated_at AS "updatedAt", c.name AS "categoryName", c.img AS "categoryImg", c.id AS "categoryId", authors.name || ' ' || authors.surname AS author
-  FROM articles AS a
-  JOIN categories AS c ON c.id = a.category_id
-  JOIN authors ON authors.id = a.author_id
-  `;
-
-const articlesQuery = `SELECT
-a.id AS _id, a.headline AS "headLine", a.subhead AS "subHead", a.content AS content,
-a.cover AS cover, a.created_at AS "createdAt", a.updated_at AS "updatedAt",
-CONCAT('{',json_object_agg('_id', authors.id),', ',json_object_agg('name', CONCAT(' ',authors.name, authors.surname)),', ',json_object_agg('img', categories.img), '}') AS author,
-CONCAT('{',json_object_agg('_id', categories.id),', ',json_object_agg('name', categories.name),', ',json_object_agg('img', categories.img), '}') AS category,
-json_agg(row_to_json((SELECT ColName FROM (SELECT r.id, r.text, r.created_at) AS ColName (_id, TEXT, "createdAt")))) AS reviews
-FROM articles AS a
-INNER JOIN categories ON a.category_id = categories.id
-INNER JOIN authors ON authors.id = a.author_id
-INNER JOIN reviews AS r ON r.author_id = a.id
-GROUP BY a.id`;
-
 ArticlesRouter.route("/")
   .get(async (req, res, next) => {
     try {
-      // const { rows } = await Articles.find();
-      // rows.map((r) => {
-      //   r._id = r.id;
-      //   delete r.id;
-      // });
-      // const rrr = await db.query(
-      //   "SELECT row_to_json(row) from (select categories.* ROW(categories.name::came) as came from categories )row;"
-      // );
-
-      // res.send(rrr);
-      const { rows } = await db.query(articlesQuery);
-      const response = { articles: rows };
-      res.send(response);
+      const data = await db.Article.findAll({
+        include: { model: Category, where: articles.categoryId },
+      });
+      // const { rows } = await db.query(articlesQuery);
+      // const response = { articles: rows };
+      res.send(data);
     } catch (e) {
       next(e);
     }
